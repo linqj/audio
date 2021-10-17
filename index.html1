@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--<link rel="stylesheet" href="reset.css">-->
+    <!--video兼容各个浏览器-->
+    <!--<script src="http://html5media.googlecode.com/svn/trunk/src/html5media.min.js"></script>-->
+    <title>横琴之梦</title>
+    <style>
+        html,body{
+            margin:0;
+            padding:0;
+        }
+        #bgmusic{
+            display:block;
+            margin: 200px auto 0;
+            width:80%;
+            height:auto;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <audio autoplay preload loop controls id="bgmusic">
+        <source src="http://static.e-hqins.com/cms/material/hq-sound-qf.ogg" type="audio/ogg">
+        <source src="http://static.e-hqins.com/cms/material/hq-audio-qf.mp3" type="audio/mpeg">
+    </audio>
+    <script>
+        (function() {
+            function log(info) {
+                console.log(info);
+                // alert(info);
+            }
+            function forceSafariPlayAudio() {
+                audioEl.load(); // iOS 9   还需要额外的 load 一下, 否则直接 play 无效
+                audioEl.play(); // iOS 7/8 仅需要 play 一下
+            }
+
+            var audioEl = document.getElementById('bgmusic');
+
+            // 可以自动播放时正确的事件顺序是
+            // loadstart
+            // loadedmetadata
+            // loadeddata
+            // canplay
+            // play
+            // playing
+            //
+            // 不能自动播放时触发的事件是
+            // iPhone5  iOS 7.0.6 loadstart
+            // iPhone6s iOS 9.1   loadstart -> loadedmetadata -> loadeddata -> canplay
+            audioEl.addEventListener('loadstart', function() {
+                log('loadstart');
+            }, false);
+            audioEl.addEventListener('loadeddata', function() {
+                log('loadeddata');
+            }, false);
+            audioEl.addEventListener('loadedmetadata', function() {
+                log('loadedmetadata');
+            }, false);
+            audioEl.addEventListener('canplay', function() {
+                log('canplay');
+            }, false);
+            audioEl.addEventListener('play', function() {
+                log('play');
+                // 当 audio 能够播放后, 移除这个事件
+                window.removeEventListener('touchstart', forceSafariPlayAudio, false);
+            }, false);
+            audioEl.addEventListener('playing', function() {
+                log('playing');
+            }, false);
+            audioEl.addEventListener('pause', function() {
+                log('pause');
+            }, false);
+
+            // 由于 iOS Safari 限制不允许 audio autoplay, 必须用户主动交互(例如 click)后才能播放 audio,
+            // 因此我们通过一个用户交互事件来主动 play 一下 audio.
+            window.addEventListener('touchstart', forceSafariPlayAudio, false);
+
+            audioEl.src = 'http://www.w3school.com.cn/i/song.mp3';
+        })();
+    </script>
+    <!--<video src="http://cms-dev-os-01.oss-cn-szfinance.aliyuncs.com/cms/material/hengqin_PF.mp3?d=1533779952000" controls autobuffer class="video"></video>-->
+</div>
+</body>
+</html>
